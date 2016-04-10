@@ -13,7 +13,7 @@ func main() {
 	vs := vinxi.NewServer(vinxi.ServerOptions{Port: port})
 
 	// Attach the metrics middleware
-	vs.Use(metrics.New(collector(collect)))
+	vs.Use(metrics.New(reporter(collect)))
 
 	// Target server to forward
 	vs.Forward("http://httpbin.org")
@@ -25,11 +25,11 @@ func main() {
 	}
 }
 
-// Simple stub collector
-type collector func(metrics.Reporter)
+// Simple stub reporter
+type reporter func(metrics.Report)
 
-func (c collector) Collect(r metrics.Reporter) {
-	return c(r)
+func (c reporter) Report(r metrics.Report) {
+	c(r)
 }
 
 func collect(r metrics.Report) {
