@@ -10,6 +10,10 @@ import (
 	"gopkg.in/vinxi/metrics.v0"
 )
 
+// TimePrecision defines the default time precision used in batch points.
+// For more info, see: https://docs.influxdata.com/influxdb/v0.8/api/reading_and_writing_data/#time-precision-on-written-data
+var TimePrecision = "ms"
+
 // Config stores the InfluxDB connection params.
 type Config struct {
 	URL      string
@@ -51,16 +55,16 @@ func (r *Reporter) makeClient() (err error) {
 }
 
 func (r *Reporter) send(re metrics.Report) error {
-	// Create a new point batch
+	// Create a new batch to store data points
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
-		Precision: "s",
+		Precision: TimePrecision,
 		Database:  r.config.Database,
 	})
 	if err != nil {
 		return err
 	}
 
-	// Map metrics report into influx points
+	// Map metrics report into influx compatible points
 	if err := r.mapReport(re, bp); err != nil {
 		return err
 	}
@@ -72,7 +76,7 @@ func (r *Reporter) send(re metrics.Report) error {
 func (r *Reporter) mapReport(re metrics.Report, bp client.BatchPoints) error {
 	now := time.Now()
 
-	// Extract histograms properly
+	// Extract histograms from standalone gauges
 	gauges, histograms := extractHistograms(re.Gauges)
 
 	// Add histograms
