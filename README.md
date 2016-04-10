@@ -120,8 +120,8 @@ type Reporter interface {
 }
 ```
 
-The metrics publisher will call the `Report` method passing the `Report` struct, which exports 
-two fields containing the counters and gauges as a simple map data type.
+The metrics publisher will call the `Report` method passing the `Report` struct, 
+which exports the fields `Counters` and `Gauges`.
 
 #### Reporter example
 
