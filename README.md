@@ -1,18 +1,46 @@
 # metrics [![Build Status](https://travis-ci.org/vinxi/metrics.png)](https://travis-ci.org/vinxi/metrics) [![GoDoc](https://godoc.org/github.com/vinxi/metrics?status.svg)](https://godoc.org/github.com/vinxi/metrics) [![Coverage Status](https://coveralls.io/repos/github/vinxi/metrics/badge.svg?branch=master)](https://coveralls.io/github/vinxi/metrics?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/vinxi/metrics)](https://goreportcard.com/report/github.com/vinxi/metrics)
 
 Simple, extensible metrics instrumentation for your proxies. 
-Collects useful and versatile metrics of duplex HTTP traffic flow and Go runtime stats.
 
+Collects useful and versatile metrics of duplex HTTP traffic flows and Go runtime stats.
+
+Supports `counters`, `gauges` and `histogram` with `50`, `75`, `90`, `95`, `99` and `999` percentiles.
 Uses [codahale/metrics](https://github.com/codahale/metrics) under the hood.
 
 ## Reporters
 
-- [x] InfluxDB
-- [ ] Statsd
-- [ ] Prometheus
+Reporters are pluggable components that reads metric reports and tipically sends 
+it to an data ingestor provider. 
 
 You can write and plug in your own reporter. 
 See [how to write reporters](#writting-reporters) section.
+
+Built-in supported reporters:
+
+- [x] [InfluxDB](https://github.com/vinxi/metrics/tree/master/reporters/influx)
+- [ ] Statsd
+- [ ] Prometheus
+
+## Meters
+
+Meters are simple functions that reads HTTP request/response info and generates 
+further counters, gauges or histograms based on it.
+
+`metrics` package allows you to easily extend meter function in order to measure 
+custom or new properies of the HTTP flow to cover your specific needs.
+See [how to write meters](#writting-meters) section.
+
+Default provided meters (listed as: description, measure type, metric name):
+
+- Total requests - `counter` - `req.total.count`
+- Total success responses - `counter` - `res.status.ok.count`
+- Total error responses - `counter` - `res.status.error.count`
+- Total bad responses - `counter` - `res.status.bad.count`
+- Total read requests - `counter` - `req.reads.count`
+- Total write requests - `counter` - `req.writes.count`
+- Response time in milliseconds - `histogram` - `res.time.histogram`
+- Response body size in KB - `histogram` - `res.body.size.histogram`
+- Request body size in KB - `histogram` - `req.body.size.histogram`
 
 ## Installation
 
@@ -116,7 +144,7 @@ Reporters must implement the `Reporter` interface, which consists is a single me
 
 ```go
 type Reporter interface {
-  Report(Report)
+  Report(metrics.Report)
 }
 ```
 
@@ -146,6 +174,69 @@ func (m *MyCustomReporter) Report(r metrics.Report) {
     
   // Finally send the metrics, tipically via network to another server
   reporterClient.Send(data)
+}
+```
+
+## Writting meters
+
+Meters are simple functions implementing the following function signature:
+
+```go
+type MeterFunc func(*metrics.Info, *metrics.Metrics)
+```
+
+#### Meter example
+
+```go
+package main
+
+import (
+  "fmt"
+  "gopkg.in/vinxi/metrics.v0"
+  "gopkg.in/vinxi/vinxi.v0"
+)
+
+const port = 3100
+
+func main() {
+  // Create a new vinxi proxy
+  vs := vinxi.NewServer(vinxi.ServerOptions{Port: port})
+
+  // Create a custom meter function the increases a counter
+  // when the response status is 200
+  myMeter := func(i *metrics.Info, m *metrics.Metrics) {
+    if i.Status == 200 {
+      m.Counter("res.success.total").Add()
+    }
+  }
+
+  // Create a new metrics middleware
+  m := metrics.New(reporter(collect))
+  // Add the custom meter
+  m.AddMeter(myMeter)
+  // Attach the metrics middleware
+  vs.Use(m)
+
+  // Target server to forward
+  vs.Forward("http://httpbin.org")
+
+  fmt.Printf("Server listening on port: %d\n", port)
+  err := vs.Listen()
+  if err != nil {
+    fmt.Errorf("Error: %s\n", err)
+  }
+}
+
+// Simple stub reporter
+type reporter func(metrics.Report)
+
+func (c reporter) Report(r metrics.Report) {
+  c(r)
+}
+
+func collect(r metrics.Report) {
+  fmt.Printf("Gaudes: %#v\n", r.Gauges)
+  fmt.Printf("Counters: %#v\n", r.Counters)
 }
 ```
 

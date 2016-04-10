@@ -6,7 +6,7 @@ import (
 )
 
 // RuntimeInterval the amount of time to wait between runtime metrics report cycles.
-// Defaults to 15 seconds.
+// Defaults to 10 seconds.
 var RuntimeInterval = 10 * time.Second
 
 // GaugeFunc is an interface that implements the setting of a gauge value
