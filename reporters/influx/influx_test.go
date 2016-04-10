@@ -13,35 +13,29 @@ var testConfig = Config{URL: "http://foo"}
 func TestMapReportCounters(t *testing.T) {
 	counters := make(map[string]uint64)
 	counters["foo"] = 100
-	counters["bar"] = 200
 	report := metrics.Report{Counters: counters}
 	reporter := New(testConfig)
 
 	bp, _ := client.NewBatchPoints(client.BatchPointsConfig{})
 	reporter.mapReport(report, bp)
 
-	st.Expect(t, len(bp.Points()), 2)
+	st.Expect(t, len(bp.Points()), 1)
 	st.Expect(t, bp.Points()[0].Name(), "foo.count")
 	st.Expect(t, bp.Points()[0].Fields()["value"], int64(100))
-	st.Expect(t, bp.Points()[1].Name(), "bar.count")
-	st.Expect(t, bp.Points()[1].Fields()["value"], int64(200))
 }
 
 func TestMapReportGauges(t *testing.T) {
 	gauges := make(map[string]int64)
 	gauges["foo"] = 100
-	gauges["bar"] = 200
 	report := metrics.Report{Gauges: gauges}
 	reporter := New(testConfig)
 
 	bp, _ := client.NewBatchPoints(client.BatchPointsConfig{})
 	reporter.mapReport(report, bp)
 
-	st.Expect(t, len(bp.Points()), 2)
+	st.Expect(t, len(bp.Points()), 1)
 	st.Expect(t, bp.Points()[0].Name(), "foo.gauge")
 	st.Expect(t, bp.Points()[0].Fields()["value"], int64(100))
-	st.Expect(t, bp.Points()[1].Name(), "bar.gauge")
-	st.Expect(t, bp.Points()[1].Fields()["value"], int64(200))
 }
 
 func TestMapReportHistograms(t *testing.T) {
