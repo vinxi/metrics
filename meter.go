@@ -78,12 +78,14 @@ func (m *Meter) Register(mw layer.Middleware) {
 	mw.UsePriority("request", layer.TopHead, m.measureHTTP)
 }
 
-// Publish release store.
+// Publish publishes the metrics snapshot report to the registered reporters.
 func (m *Meter) Publish() {
-	for _, reporter := range m.reporters {
-		reporter.Report(m.metrics.Snapshot())
-	}
+	report := m.metrics.Snapshot()
 	m.metrics.Reset()
+
+	for _, reporter := range m.reporters {
+		go reporter.Report(report)
+	}
 }
 
 // Start starts a time ticker to publish metrics every certain amount of time.
@@ -110,8 +112,8 @@ func (m *Meter) Stop() {
 // measureHTTP instruments and logs an incoming HTTP request and response.
 func (m *Meter) measureHTTP(h http.Handler) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		m := newMetricsWriter(w, r, m.gauge)
-		h.ServeHTTP(m, r)
+		mw := newMetricsWriter(w, r, m.gauge)
+		h.ServeHTTP(mw, r)
 	}
 }
 

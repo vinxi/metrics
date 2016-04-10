@@ -101,7 +101,7 @@ func (m *Metrics) Snapshot() Report {
 }
 
 // Reset resets all the metrics (counters, gauges & histograms) to zero.
-// You should collect them first with Snapshop(), otherview the collected data will be lost.
+// You should collect them first with Snapshot(), otherwise the collected data will be lost.
 func (m *Metrics) Reset() {
 	metrics.Reset()
 	m.Lock()
