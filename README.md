@@ -112,7 +112,7 @@ func main() {
 `metrics` package allows you to write and plug in custom reporters in order to send data to third-party
 metrics and storage providers. 
 
-Reporters most implement the `Reporter` interface, which is a single method:
+Reporters must implement the `Reporter` interface, which consists is a single method:
 
 ```go
 type Reporter interface {
@@ -144,7 +144,7 @@ func (m *MyCustomReporter) Report(r metrics.Report) {
   // into reporter specific data structures.
   data := mapReport(r)
     
-  // Finally, send the metrics, tipically via network to another server
+  // Finally send the metrics, tipically via network to another server
   reporterClient.Send(data)
 }
 ```
