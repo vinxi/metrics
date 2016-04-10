@@ -26,11 +26,9 @@ func MeterResponseStatus(i *Info, m *Metrics) {
 	s := i.Status / 100
 	if s >= 2 && s < 4 {
 		m.Counter("res.status.ok").Add()
-	}
-	if s == 5 {
+	} else if s == 5 {
 		m.Counter("res.status.error").Add()
-	}
-	if s == 4 {
+	} else if s == 4 {
 		m.Counter("res.status.bad").Add()
 	}
 }
@@ -43,7 +41,9 @@ func MeterResponseStatus(i *Info, m *Metrics) {
 func MeterRequestOperation(i *Info, m *Metrics) {
 	if i.Request.Method == "GET" || i.Request.Method == "HEAD" {
 		m.Counter("req.reads").Add()
+		return
 	}
+
 	if i.Request.Method == "POST" || i.Request.Method == "PUT" ||
 		i.Request.Method == "PATCH" || i.Request.Method == "DELETE" {
 		m.Counter("req.writes").Add()
