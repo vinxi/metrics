@@ -9,8 +9,8 @@ import (
 )
 
 // PublishInterval defines the amount of time to wait between metrics publish cycles.
-// Defaults to 25 seconds.
-var PublishInterval = 25 * time.Second
+// Defaults to 15 seconds.
+var PublishInterval = 15 * time.Second
 
 // MeterFunc represents the function interface to be implemented by metrics meter functions.
 type MeterFunc func(*Info, *Metrics)

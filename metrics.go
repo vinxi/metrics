@@ -39,12 +39,12 @@ type Report struct {
 type Metrics struct {
 	// Mutex provides synchronization for thead safety.
 	sync.Mutex
-	// Gauges stores gauges
-	Gauges map[string]metrics.Gauge
-	// Counters stores counters by key
-	Counters map[string]metrics.Counter
-	// Histograms stores histograms by key.
-	Histograms map[string]*metrics.Histogram
+	// gauges stores gauges
+	gauges map[string]metrics.Gauge
+	// counters stores counters by key
+	counters map[string]metrics.Counter
+	// histograms stores histograms by key.
+	histograms map[string]*metrics.Histogram
 }
 
 // NewMetrics creates a new metrics object for reporting.
@@ -59,23 +59,23 @@ func NewMetrics() *Metrics {
 func (m *Metrics) Counter(key string) metrics.Counter {
 	m.Lock()
 	defer m.Unlock()
-	counter, ok := m.Counters[key]
+	counter, ok := m.counters[key]
 	if !ok {
 		counter = metrics.Counter(key)
-		m.Counters[key] = counter
+		m.counters[key] = counter
 	}
 	return counter
 }
 
-// Guige returns a guide metric by key.
+// Guage returns a guide metric by key.
 // If the guige doesn't exists, it will be transparently created.
 func (m *Metrics) Guage(key string) metrics.Gauge {
 	m.Lock()
 	defer m.Unlock()
-	gauge, ok := m.Gauges[key]
+	gauge, ok := m.gauges[key]
 	if !ok {
 		gauge = metrics.Gauge(key)
-		m.Gauges[key] = gauge
+		m.gauges[key] = gauge
 	}
 	return gauge
 }
@@ -85,10 +85,10 @@ func (m *Metrics) Guage(key string) metrics.Gauge {
 func (m *Metrics) Histogram(key string) *metrics.Histogram {
 	m.Lock()
 	defer m.Unlock()
-	hist, ok := m.Histograms[key]
+	hist, ok := m.histograms[key]
 	if !ok {
 		hist = metrics.NewHistogram(key, 0, 1e8, 5)
-		m.Histograms[key] = hist
+		m.histograms[key] = hist
 	}
 	return hist
 }
@@ -105,8 +105,8 @@ func (m *Metrics) Snapshot() Report {
 func (m *Metrics) Reset() {
 	metrics.Reset()
 	m.Lock()
-	m.Gauges = make(map[string]metrics.Gauge)
-	m.Counters = make(map[string]metrics.Counter)
-	m.Histograms = make(map[string]*metrics.Histogram)
+	m.gauges = make(map[string]metrics.Gauge)
+	m.counters = make(map[string]metrics.Counter)
+	m.histograms = make(map[string]*metrics.Histogram)
 	m.Unlock()
 }

@@ -12,21 +12,21 @@ func TestMeterNumberOfRequests(t *testing.T) {
 	info, metrics := createMetrics()
 	defer metrics.Reset()
 	MeterNumberOfRequests(info, metrics)
-	st.Expect(t, len(metrics.Counters), 1)
+	st.Expect(t, len(metrics.counters), 1)
 	st.Expect(t, metrics.Snapshot().Counters["req.total"], uint64(1))
 }
 
 func TestMeterResponseStatus(t *testing.T) {
 	info, metrics := createMetrics()
 	MeterResponseStatus(info, metrics)
-	st.Expect(t, len(metrics.Counters), 1)
+	st.Expect(t, len(metrics.counters), 1)
 	st.Expect(t, metrics.Snapshot().Counters["res.status.ok"], uint64(1))
 	metrics.Reset()
 
 	info, metrics = createMetrics()
 	info.Status = 400
 	MeterResponseStatus(info, metrics)
-	st.Expect(t, len(metrics.Counters), 1)
+	st.Expect(t, len(metrics.counters), 1)
 	st.Expect(t, metrics.Snapshot().Counters["res.status.ok"], uint64(0))
 	st.Expect(t, metrics.Snapshot().Counters["res.status.bad"], uint64(1))
 	metrics.Reset()
@@ -34,7 +34,7 @@ func TestMeterResponseStatus(t *testing.T) {
 	info, metrics = createMetrics()
 	info.Status = 500
 	MeterResponseStatus(info, metrics)
-	st.Expect(t, len(metrics.Counters), 1)
+	st.Expect(t, len(metrics.counters), 1)
 	st.Expect(t, metrics.Snapshot().Counters["res.status.ok"], uint64(0))
 	st.Expect(t, metrics.Snapshot().Counters["res.status.bad"], uint64(0))
 	st.Expect(t, metrics.Snapshot().Counters["res.status.error"], uint64(1))
@@ -44,14 +44,14 @@ func TestMeterResponseStatus(t *testing.T) {
 func TestMeterRequestOperation(t *testing.T) {
 	info, metrics := createMetrics()
 	MeterRequestOperation(info, metrics)
-	st.Expect(t, len(metrics.Counters), 1)
+	st.Expect(t, len(metrics.counters), 1)
 	st.Expect(t, metrics.Snapshot().Counters["req.reads"], uint64(1))
 	metrics.Reset()
 
 	info, metrics = createMetrics()
 	info.Request.Method = "POST"
 	MeterRequestOperation(info, metrics)
-	st.Expect(t, len(metrics.Counters), 1)
+	st.Expect(t, len(metrics.counters), 1)
 	st.Expect(t, metrics.Snapshot().Counters["req.reads"], uint64(0))
 	st.Expect(t, metrics.Snapshot().Counters["req.writes"], uint64(1))
 	metrics.Reset()
