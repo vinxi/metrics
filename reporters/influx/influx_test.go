@@ -8,12 +8,14 @@ import (
 	"gopkg.in/vinxi/metrics.v0"
 )
 
+var testConfig = Config{URL: "http://foo"}
+
 func TestMapReportCounters(t *testing.T) {
 	counters := make(map[string]uint64)
 	counters["foo"] = 100
 	counters["bar"] = 200
 	report := metrics.Report{Counters: counters}
-	reporter := New(Config{})
+	reporter := New(testConfig)
 
 	bp, _ := client.NewBatchPoints(client.BatchPointsConfig{})
 	reporter.mapReport(report, bp)
@@ -30,7 +32,7 @@ func TestMapReportGauges(t *testing.T) {
 	gauges["foo"] = 100
 	gauges["bar"] = 200
 	report := metrics.Report{Gauges: gauges}
-	reporter := New(Config{})
+	reporter := New(testConfig)
 
 	bp, _ := client.NewBatchPoints(client.BatchPointsConfig{})
 	reporter.mapReport(report, bp)
@@ -51,7 +53,7 @@ func TestMapReportHistograms(t *testing.T) {
 	gauges["foo.P99"] = 99
 	gauges["foo.P999"] = 999
 	report := metrics.Report{Gauges: gauges}
-	reporter := New(Config{})
+	reporter := New(testConfig)
 
 	bp, _ := client.NewBatchPoints(client.BatchPointsConfig{})
 	reporter.mapReport(report, bp)

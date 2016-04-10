@@ -38,13 +38,14 @@ func main() {
 }
 
 // Simple stub reporter
-type reporter func(metrics.Report)
+type reporter func(metrics.Report) error
 
-func (c reporter) Report(r metrics.Report) {
-	c(r)
+func (c reporter) Report(r metrics.Report) error {
+	return c(r)
 }
 
-func collect(r metrics.Report) {
+func collect(r metrics.Report) error {
 	fmt.Printf("Gaudes: %#v\n", r.Gauges)
 	fmt.Printf("Counters: %#v\n", r.Counters)
+	return nil
 }

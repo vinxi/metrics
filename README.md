@@ -144,7 +144,7 @@ Reporters must implement the `Reporter` interface, which consists is a single me
 
 ```go
 type Reporter interface {
-  Report(metrics.Report)
+  Report(metrics.Report) error
 }
 ```
 
@@ -228,15 +228,16 @@ func main() {
 }
 
 // Simple stub reporter
-type reporter func(metrics.Report)
+type reporter func(metrics.Report) error
 
-func (c reporter) Report(r metrics.Report) {
-  c(r)
+func (c reporter) Report(r metrics.Report) error {
+  return c(r)
 }
 
-func collect(r metrics.Report) {
+func collect(r metrics.Report) error {
   fmt.Printf("Gaudes: %#v\n", r.Gauges)
   fmt.Printf("Counters: %#v\n", r.Counters)
+  return nil
 }
 ```
 

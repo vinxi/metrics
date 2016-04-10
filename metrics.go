@@ -67,8 +67,8 @@ func (m *Metrics) Counter(key string) metrics.Counter {
 	return counter
 }
 
-// Guage returns a guide metric by key.
-// If the guige doesn't exists, it will be transparently created.
+// Guage returns a gauge metric by key.
+// If the gauge doesn't exists, it will be transparently created.
 func (m *Metrics) Guage(key string) metrics.Gauge {
 	m.Lock()
 	defer m.Unlock()

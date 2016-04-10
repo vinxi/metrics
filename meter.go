@@ -19,7 +19,7 @@ type MeterFunc func(*Info, *Metrics)
 // Metric reporters are responsable of reading, filtering and adapting metrics data.
 // Also, reporters tipically sends the metrics to an external service.
 type Reporter interface {
-	Report(Report)
+	Report(Report) error
 }
 
 // Meter provides a metrics instrumentation for vinxi

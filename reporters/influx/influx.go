@@ -31,18 +31,20 @@ type Reporter struct {
 
 // New creates a new InfluxDB reporter which will post the metrics to the specified server.
 func New(c Config) *Reporter {
-	re := &reporter{config: c}
+	re := &Reporter{config: c}
 	if err := re.makeClient(); err != nil {
 		log.Printf("unable to make InfluxDB client. err=%v", err)
 	}
 	return re
 }
 
-// Report implements the metrisc.Reporter interface.
-func (r *Reporter) Report(re metrics.Report) {
-	if err := r.send(re); err != nil {
+// Report implements the metrics.Reporter interface.
+func (r *Reporter) Report(re metrics.Report) error {
+	err := r.send(re)
+	if err != nil {
 		log.Printf("infludb: error sending metrics err=%v", err)
 	}
+	return err
 }
 
 func (r *Reporter) makeClient() (err error) {
