@@ -1,10 +1,10 @@
 # metrics [![Build Status](https://travis-ci.org/vinxi/metrics.png)](https://travis-ci.org/vinxi/metrics) [![GoDoc](https://godoc.org/github.com/vinxi/metrics?status.svg)](https://godoc.org/github.com/vinxi/metrics) [![Coverage Status](https://coveralls.io/repos/github/vinxi/metrics/badge.svg?branch=master)](https://coveralls.io/github/vinxi/metrics?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/vinxi/metrics)](https://goreportcard.com/report/github.com/vinxi/metrics)
 
-Simple, extensible metrics instrumentation for your proxies. 
+Simple and extensible metrics instrumentation for your proxies. 
+Collects useful and versatile metrics based on the analysis of duplex HTTP traffic and Go runtime stats.
 
-Collects useful and versatile metrics of duplex HTTP traffic flows and Go runtime stats.
+Supports `counters`, `gauges` and `histogram` with `50`, `75`, `90`, `95`, `99` and `99.9` percentiles.
 
-Supports `counters`, `gauges` and `histogram` with `50`, `75`, `90`, `95`, `99` and `999` percentiles.
 Uses [codahale/metrics](https://github.com/codahale/metrics) under the hood.
 
 ## Reporters
